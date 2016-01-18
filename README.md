@@ -70,7 +70,7 @@ The id and name of the requesting user should be returned when a token is valida
 The id and name will be blindly passed to the handler (if requested by the handler), so feel free to default one if they are not used.
 
 The signature for the validation function looks like:
-```golang
+```go
 type ValidateToken func(token string, log Logger) (userId int, userName string, err error)
 ```
 
@@ -127,13 +127,14 @@ The logger should honor panic semantics and immediatly halt the runtime.
 After you get an ApiMethod, you can call ApiMethod.Middleware() to get a function that can be used by http.HandleFunc().
 
 The returned function will have the signature:
-```golang
+```go
 func(response http.ResponseWriter, request *http.Request)
 ```
 
 Typical usage may look something like:
-```golang
+```go
 import "net/http"
+import "github.com/eriq-augustine/goapi"
 
 func SetupAPI() {
    var factory ApiMethodFactory;
