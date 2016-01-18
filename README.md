@@ -32,9 +32,9 @@ Because refection in Go does not allow you to find the parameter's name, we must
 
 In addition to explicitly defined parameters, your handler can have up to five implicit parameters.
 These parameters may appear in ANY order in your handler function and you may pick and choose the ones you want (or none).
- - userId api.UserId - The id of the user making the request (requires authentication).
- - userName api.UserName - The name of the user making the request (requires authentication).
- - token api.Token - The token of the user making the request (requires authentication).
+ - userId goapi.UserId - The id of the user making the request (requires authentication).
+ - userName goapi.UserName - The name of the user making the request (requires authentication).
+ - token goapi.Token - The token of the user making the request (requires authentication).
  - request *http.Request - The http request.
  - response http.ResponseWriter - The http response (you should only use this in extreme cases).
 Remember that in Go, we cannot get parameter names.
@@ -91,20 +91,20 @@ Set using ApiMethodFactory.SetContentType().
 ### Logger
 
 The logging mechanism to use while handling the API.
-Defaults to a api.ConsoleLogger.
+Defaults to a goapi.ConsoleLogger.
 Set using ApiMethodFactory.SetLogger().
 
 ### Serializer
 
 The serialization mechanism to use to convert handler responses into a string.
-Defaults to a api.JSONSerializer.
+Defaults to a goapi.JSONSerializer.
 Set using ApiMethodFactory.SetSerializer().
 
 ### Error Responder
 
 A function to choose the proper response for errors while handling a request.
 The function should return an object that can be handled by the factory's serializer.
-Defaults to a api.GeneralErrorResponder.
+Defaults to a goapi.GeneralErrorResponder.
 Set using ApiMethodFactory.SetErrorResponder().
 
 ### Token Validation
@@ -146,8 +146,8 @@ func SetupAPI() {
          somethingHandler, // Handler
          false, // Do not authenticate
          []ApiMethodParam{
-            {"someRequiredIntParam", api.API_PARAM_TYPE_STRING, true},
-            {"someOptionalStringParam", api.API_PARAM_TYPE_STRING, false},
+            {"someRequiredIntParam", goapi.API_PARAM_TYPE_STRING, true},
+            {"someOptionalStringParam", goapi.API_PARAM_TYPE_STRING, false},
          },
       ),
       factory.NewApiMethod(

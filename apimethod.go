@@ -71,19 +71,19 @@ func (method ApiMethod) validate() {
    for i := 0; i < numParams; i++ {
       var ParamType reflect.Type = handlerType.In(i);
 
-      if (ParamType.String() == "api.Token") {
+      if (ParamType.String() == "goapi.Token") {
          additionalParams++;
 
          if (!method.auth) {
             method.log.Panic(fmt.Sprintf("API handler (%s) requested a token without authentication", method.path));
          }
-      } else if (ParamType.String() == "api.UserId") {
+      } else if (ParamType.String() == "goapi.UserId") {
          additionalParams++;
 
          if (!method.auth) {
             method.log.Panic(fmt.Sprintf("API handler (%s) requested a user id without authentication", method.path));
          }
-      } else if (ParamType.String() == "api.UserName") {
+      } else if (ParamType.String() == "goapi.UserName") {
          additionalParams++;
 
          if (!method.auth) {
@@ -216,11 +216,11 @@ func (method ApiMethod) createArguments(userId UserId, userName UserName, token 
       var ParamType reflect.Type = handlerType.In(i);
 
       // The user id, token, request, and response get handled specially.
-      if (method.auth && ParamType.String() == "api.Token") {
+      if (method.auth && ParamType.String() == "goapi.Token") {
          paramValues[i] = reflect.ValueOf(token);
-      } else if (method.auth && ParamType.String() == "api.UserId") {
+      } else if (method.auth && ParamType.String() == "goapi.UserId") {
          paramValues[i] = reflect.ValueOf(userId);
-      } else if (method.auth && ParamType.String() == "api.UserName") {
+      } else if (method.auth && ParamType.String() == "goapi.UserName") {
          paramValues[i] = reflect.ValueOf(userName);
       } else if (ParamType.String() == "*http.Request") {
          paramValues[i] = reflect.ValueOf(request);
