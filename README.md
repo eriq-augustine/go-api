@@ -138,7 +138,7 @@ import "github.com/eriq-augustine/goapi"
 
 func SetupAPI() {
    var factory ApiMethodFactory;
-   factory.setTokenValidator(myJWTTokenValidator);
+   factory.SetTokenValidator(myJWTTokenValidator);
 
    methods := []ApiMethod{
       factory.NewApiMethod(
