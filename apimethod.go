@@ -40,8 +40,8 @@ type ApiMethodParam struct {
    Required bool
 }
 
-func (method ApiMethod) Path() {
-   return path;
+func (method ApiMethod) Path() string {
+   return method.path;
 }
 
 // Will just panic on error.
