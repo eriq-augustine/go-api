@@ -12,23 +12,23 @@ type ApiMethodFactory struct {
    tokenValidator ValidateToken
 }
 
-func (factory ApiMethodFactory) SetLogger(log Logger) {
+func (factory *ApiMethodFactory) SetLogger(log Logger) {
    factory.log = log;
 }
 
-func (factory ApiMethodFactory) SetSerializer(serializer Serializer) {
+func (factory *ApiMethodFactory) SetSerializer(serializer Serializer) {
    factory.serializer = serializer;
 }
 
-func (factory ApiMethodFactory) SetContentType(contentType string) {
+func (factory *ApiMethodFactory) SetContentType(contentType string) {
    factory.contentType = contentType;
 }
 
-func (factory ApiMethodFactory) SetGeneralErrorResponser(responder ErrorResponder) {
+func (factory *ApiMethodFactory) SetGeneralErrorResponser(responder ErrorResponder) {
    factory.errorResponder = responder;
 }
 
-func (factory ApiMethodFactory) SetTokenValidator(validator ValidateToken) {
+func (factory *ApiMethodFactory) SetTokenValidator(validator ValidateToken) {
    factory.tokenValidator = validator;
 }
 
