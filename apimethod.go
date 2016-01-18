@@ -40,6 +40,10 @@ type ApiMethodParam struct {
    Required bool
 }
 
+func (method ApiMethod) Path() {
+   return path;
+}
+
 // Will just panic on error.
 func (method ApiMethod) validate() {
    // Check the definitions.
@@ -330,8 +334,4 @@ func (method ApiMethod) authRequest(request *http.Request) (bool, int, string, s
    }
 
    return true, userId, userName, token, nil;
-}
-
-func (method ApiMethod) notFound() (interface{}, int) {
-   return method.errorResponder(nil, http.StatusNotFound), http.StatusNotFound;
 }
