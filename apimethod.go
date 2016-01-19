@@ -57,7 +57,7 @@ func (method ApiMethod) validate() {
 
    for _, param := range(method.params) {
       if (param.Name == "") {
-         method.log.Panic(fmt.Sprintf("Nil name for param for API handler for path: %s", method.path));
+         method.log.Panic(fmt.Sprintf("Empty name for param for API handler for path: %s", method.path));
       }
 
       if (!(param.ParamType == API_PARAM_TYPE_INT || param.ParamType == API_PARAM_TYPE_STRING)) {

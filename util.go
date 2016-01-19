@@ -17,7 +17,7 @@ func getToken(request *http.Request) (string, bool) {
       return "", false;
    }
 
-   token := strings.TrimPrefix(strings.TrimSpace(authHeader[0]), "Bearer ");
+   token := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(authHeader[0]), "Bearer"));
 
    if (token == "") {
       return "", false;
@@ -26,7 +26,7 @@ func getToken(request *http.Request) (string, bool) {
    return token, true;
 }
 
-func ToJSON(data interface{}) (string, error) {
+func toJSON(data interface{}) (string, error) {
    bytes, err := json.Marshal(data);
    if (err != nil) {
       return "", err;
