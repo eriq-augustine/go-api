@@ -1,6 +1,7 @@
 package goapi;
 
 import (
+   "fmt"
    "net/http"
    "testing"
 )
@@ -12,6 +13,42 @@ type TestInfo struct {
    auth bool
    params []ApiMethodParam
    valid bool
+}
+
+func ExampleApiMethod_String_simple() {
+   factory := ApiMethodFactory{};
+   factory.SetTokenValidator(fakeValidateToken);
+   method := factory.NewApiMethod("/good/path", handler_empty, true, []ApiMethodParam{});
+   fmt.Println(method);
+
+   // Output:
+   // /good/path
+   //    Authentication Required: true
+   //    Params: None
+   //    Handler: github.com/eriq-augustine/goapi.handler_empty
+}
+
+func ExampleApiMethod_String_params() {
+   factory := ApiMethodFactory{};
+   factory.SetTokenValidator(fakeValidateToken);
+   method := factory.NewApiMethod(
+      "/other/path",
+      handler_intString,
+      false,
+      []ApiMethodParam{
+         ApiMethodParam{"someInt", API_PARAM_TYPE_INT, true},
+         ApiMethodParam{"someString", API_PARAM_TYPE_STRING, false},
+      },
+   );
+   fmt.Println(method);
+
+   // Output:
+   // /other/path
+   //    Authentication Required: false
+   //    Params:
+   //       someInt int (required)
+   //       someString string
+   //    Handler: github.com/eriq-augustine/goapi.handler_intString
 }
 
 func TestValidation(t *testing.T) {
@@ -289,6 +326,9 @@ func handler_string(someString string) {
 }
 
 func handler_int(someInt int) {
+}
+
+func handler_intString(someInt int, someString string) {
 }
 
 func handler_multipleIntString(someInt1 int, someString1 string, someInt2 int, someString2 string) {

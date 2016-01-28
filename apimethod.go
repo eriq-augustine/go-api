@@ -4,6 +4,7 @@ import (
    "fmt"
    "net/http"
    "reflect"
+   "runtime"
    "strconv"
    "strings"
 )
@@ -334,4 +335,37 @@ func (method ApiMethod) authRequest(request *http.Request) (bool, int, string, s
    }
 
    return true, userId, userName, token, nil;
+}
+
+func (method ApiMethod) String() string {
+   var rtn string = "";
+
+   rtn += fmt.Sprintf("%s\n", method.path);
+   rtn += fmt.Sprintf("   Authentication Required: %v\n", method.auth);
+
+   if (len(method.params) == 0) {
+      rtn += "   Params: None\n"
+   } else {
+      rtn += "   Params:\n"
+      for _, param := range(method.params) {
+         rtn += fmt.Sprintf("      %v\n", param);
+      }
+   }
+
+   rtn += fmt.Sprintf("   Handler: %s ", runtime.FuncForPC(reflect.ValueOf(method.handler).Pointer()).Name());
+   return rtn;
+}
+
+func (param ApiMethodParam) String() string {
+   var typeString string = "int";
+   if (param.ParamType == API_PARAM_TYPE_STRING) {
+      typeString = "string";
+   }
+
+   var requiredString string = "";
+   if (param.Required) {
+      requiredString = " (required)";
+   }
+
+   return fmt.Sprintf("%s %s%s", param.Name, typeString, requiredString);
 }
