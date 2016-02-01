@@ -2,6 +2,7 @@ package goapi;
 
 import (
    "fmt"
+   "mime/multipart"
    "net/http"
    "reflect"
    "runtime"
@@ -16,12 +17,14 @@ const (
 const (
    API_PARAM_TYPE_INT = iota
    API_PARAM_TYPE_STRING
+   API_PARAM_TYPE_FILE
 )
 
 // We need to define these as types, so we can figure it out when we want to pass params.
 type Token string;
 type UserId int;
 type UserName string;
+type File multipart.File;
 
 type ApiMethod struct {
    path string
@@ -61,7 +64,7 @@ func (method ApiMethod) validate() {
          method.log.Panic(fmt.Sprintf("Empty name for param for API handler for path: %s", method.path));
       }
 
-      if (!(param.ParamType == API_PARAM_TYPE_INT || param.ParamType == API_PARAM_TYPE_STRING)) {
+      if (!(param.ParamType == API_PARAM_TYPE_INT || param.ParamType == API_PARAM_TYPE_STRING || param.ParamType == API_PARAM_TYPE_FILE)) {
          method.log.Panic(fmt.Sprintf("Param (%s) for API handler (%s) has bad type (%d)", param.Name, method.path, param.ParamType));
       }
    }
@@ -99,7 +102,7 @@ func (method ApiMethod) validate() {
       } else if (ParamType.String() == "http.ResponseWriter") {
          additionalParams++;
       } else {
-         if (!(ParamType.String() == "int" || ParamType.String() == "string")) {
+         if (!(ParamType.String() == "int" || ParamType.String() == "string" || ParamType.String() == "goapi.File")) {
             method.log.Panic(fmt.Sprintf("API handler (%s) has an actual parameter with incorrect type (%s) must be string or int", method.path, ParamType.String()));
          }
       }
@@ -251,6 +254,21 @@ func (method ApiMethod) fetchParam(apiParamIndex int, request *http.Request) (bo
    request.ParseMultipartForm(MULTIPART_PARSE_SIZE);
 
    var param ApiMethodParam = method.params[apiParamIndex];
+
+   if (param.ParamType == API_PARAM_TYPE_FILE) {
+      file, _, err := request.FormFile(param.Name);
+      if (err != nil) {
+         if (param.Required) {
+            method.log.Warn(fmt.Sprintf("Required file parameter not found: %s", param.Name));
+            return false, reflect.Value{};
+         } else {
+            return true, reflect.ValueOf(nil);
+         }
+      }
+
+      return true, reflect.ValueOf(file);
+   }
+
    var stringValue string = strings.TrimSpace(request.FormValue(param.Name));
 
    if (param.Required && stringValue == "") {
@@ -263,7 +281,7 @@ func (method ApiMethod) fetchParam(apiParamIndex int, request *http.Request) (bo
       return true, reflect.ValueOf(stringValue);
    }
 
-   // We must be looking for an int (only ints and strings are allowed).
+   // We must be looking for an int (only ints, files, and strings are allowed).
 
    // First check for an empty non-required int.
    if (stringValue == "") {
@@ -360,6 +378,8 @@ func (param ApiMethodParam) String() string {
    var typeString string = "int";
    if (param.ParamType == API_PARAM_TYPE_STRING) {
       typeString = "string";
+   } else if (param.ParamType == API_PARAM_TYPE_FILE) {
+      typeString = "File";
    }
 
    var requiredString string = "";

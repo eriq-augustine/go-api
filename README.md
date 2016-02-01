@@ -17,7 +17,9 @@ An ApiMethod's parameters will be validated and passed into the ApiMethod's hand
 The name in the definition will be the name of the query http request parameter.
 This value can come from query parameters or POST form values.
 All types must match EXACTLY (eg integers must be 'int' not 'int64' or '*int').
-Parameters may either be ints (API_PARAM_TYPE_INT) or strings (API_PARAM_TYPE_STRING).
+Parameters may either be ints (API_PARAM_TYPE_INT), strings (API_PARAM_TYPE_STRING), or goapi.File (API_PARAM_TYPE_FILE).
+Note that if you want to upload files you must use PUT or POST.
+Base64 file data may be passed as a string instead.
 Feel free to pass JSON in your string.
 All parameters will be trimmed of whitespace before processing.
 

@@ -33,11 +33,12 @@ func ExampleApiMethod_String_params() {
    factory.SetTokenValidator(fakeValidateToken);
    method := factory.NewApiMethod(
       "/other/path",
-      handler_intString,
+      handler_intStringFile,
       false,
       []ApiMethodParam{
          ApiMethodParam{"someInt", API_PARAM_TYPE_INT, true},
          ApiMethodParam{"someString", API_PARAM_TYPE_STRING, false},
+         ApiMethodParam{"someFile", API_PARAM_TYPE_FILE, false},
       },
    );
    fmt.Println(method);
@@ -48,7 +49,8 @@ func ExampleApiMethod_String_params() {
    //    Params:
    //       someInt int (required)
    //       someString string
-   //    Handler: github.com/eriq-augustine/goapi.handler_intString
+   //       someFile File
+   //    Handler: github.com/eriq-augustine/goapi.handler_intStringFile
 }
 
 func TestValidation(t *testing.T) {
@@ -114,6 +116,16 @@ func TestValidation(t *testing.T) {
          valid: true,
       },
       {
+         title: "Valid - Params File",
+         path: "/good/path",
+         handler: handler_file,
+         auth: false,
+         params: []ApiMethodParam{
+            ApiMethodParam{"someFile", API_PARAM_TYPE_FILE, true},
+         },
+         valid: true,
+      },
+      {
          title: "Valid - Params Multiple int/string",
          path: "/good/path",
          handler: handler_multipleIntString,
@@ -163,7 +175,9 @@ func TestValidation(t *testing.T) {
          params: []ApiMethodParam{},
          valid: true,
       },
+
       // Invalid methods
+
       {
          title: "Invalid - Empty Path",
          path: "",
@@ -301,41 +315,33 @@ func fakeValidateToken(token string, log Logger) (userId int, userName string, e
 
 // Test handlers.
 
-func handler_empty() {
-}
+func handler_empty() {}
 
-func handler_request(request *http.Request) {
-}
+func handler_request(request *http.Request) {}
 
-func handler_response(response http.ResponseWriter) {
-}
+func handler_response(response http.ResponseWriter) {}
 
-func handler_implicits(id UserId, name UserName, token Token) {
-}
+func handler_implicits(id UserId, name UserName, token Token) {}
 
-func handler_userId(id UserId) {
-}
+func handler_userId(id UserId) {}
 
-func handler_userName(name UserName) {
-}
+func handler_userName(name UserName) {}
 
-func handler_token(token Token) {
-}
+func handler_token(token Token) {}
 
-func handler_string(someString string) {
-}
+func handler_string(someString string) {}
 
-func handler_int(someInt int) {
-}
+func handler_int(someInt int) {}
 
-func handler_intString(someInt int, someString string) {
-}
+func handler_file(someFile File) {}
 
-func handler_multipleIntString(someInt1 int, someString1 string, someInt2 int, someString2 string) {
-}
+func handler_intString(someInt int, someString string) {}
 
-func handler_all(token Token, someInt1 int, someString1 string, id UserId, someInt2 int, someString2 string, name UserName) {
-}
+func handler_intStringFile(someInt int, someString string, file File) {}
+
+func handler_multipleIntString(someInt1 int, someString1 string, someInt2 int, someString2 string) {}
+
+func handler_all(token Token, someInt1 int, someString1 string, id UserId, someInt2 int, someString2 string, name UserName) {}
 
 func handler_return1() (int) {
    return 0;
