@@ -30,6 +30,15 @@ If you need to have a non-required int, consider typing it as a string and inspe
 
 Because refection in Go does not allow you to find the parameter's name, we must rely on order.
 
+#### Handling Files
+
+If you want to upload a file, you can either use a base64 encoded string or do a POST/PUT with Content-Type = multipart/form-data.
+This section describes details about the later.
+On the server side, you just need to add a parameter to the definition with type goapi.API_PARAM_TYPE_FILE and a
+corresponding parameter to the handler of type goapi.File.
+If the file is not required, make sure to call goapi.File.Valid() before using the file.
+The handler owns the file once passed and is responsible for calling Close() on it.
+
 #### Implicit Parameters
 
 In addition to explicitly defined parameters, your handler can have up to five implicit parameters.
