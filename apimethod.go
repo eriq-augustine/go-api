@@ -24,7 +24,14 @@ const (
 type Token string;
 type UserId int;
 type UserName string;
-type File multipart.File;
+
+type File struct {
+   Io *multipart.File
+}
+
+func (file File) Valid() bool {
+   return file.Io != nil;
+}
 
 type ApiMethod struct {
    path string
@@ -262,11 +269,11 @@ func (method ApiMethod) fetchParam(apiParamIndex int, request *http.Request) (bo
             method.log.Warn(fmt.Sprintf("Required file parameter not found: %s", param.Name));
             return false, reflect.Value{};
          } else {
-            return true, reflect.ValueOf(nil);
+            return true, reflect.ValueOf(File{nil});
          }
       }
 
-      return true, reflect.ValueOf(file);
+      return true, reflect.ValueOf(File{&file});
    }
 
    var stringValue string = strings.TrimSpace(request.FormValue(param.Name));
