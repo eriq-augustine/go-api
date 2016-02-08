@@ -1,4 +1,4 @@
-# goapi
+# goapi [![Build Status](https://travis-ci.org/eriq-augustine/goapi.svg?branch=master)](https://travis-ci.org/eriq-augustine/goapi)
 A quick framework for making go-based HTTP APIs.
 
 ## Creating An API
