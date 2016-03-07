@@ -2,6 +2,7 @@ package goapi;
 
 import (
    "fmt"
+   "io/ioutil"
    "mime/multipart"
    "net/http"
    "reflect"
@@ -31,6 +32,14 @@ type File struct {
 
 func (file File) Valid() bool {
    return file.Io != nil;
+}
+
+func (file File) Data() ([]byte, error) {
+   if (!file.Valid()) {
+      return nil, fmt.Errorf("Cannot get data of invalid file");
+   }
+
+   return ioutil.ReadAll(*file.Io);
 }
 
 type ApiMethod struct {

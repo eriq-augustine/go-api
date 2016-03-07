@@ -39,6 +39,9 @@ corresponding parameter to the handler of type goapi.File.
 If the file is not required, make sure to call goapi.File.Valid() before using the file.
 The handler owns the file once passed and is responsible for calling Close() on it.
 
+The file is only valid for the durration of the api method call.
+Users who want to handle the file outside of the api method may call Data() on the file to obtain all the data in the file.
+
 #### Implicit Parameters
 
 In addition to explicitly defined parameters, your handler can have up to five implicit parameters.
