@@ -51,6 +51,7 @@ These parameters may appear in ANY order in your handler function and you may pi
  - token goapi.Token - The token of the user making the request (requires authentication).
  - request *http.Request - The http request.
  - response http.ResponseWriter - The http response (you should only use this in extreme cases).
+
 Remember that in Go, we cannot get parameter names.
 So you may call these parameters whatever you want, they are made unique by their types.
 request and response are obvious, but userId, userName, and token are a little more unusual.
@@ -59,18 +60,28 @@ These are typed to be an int, string, and string respectively, and are only type
 ### Handler Return Values
 
 The return value for the handler is very flexible.
-Up to three values can be returned:
+Up to four values can be returned:
  - interface{} - The value to be serialized and put in the http response.
                  This will usaully be turned to JSON.
                  Feel free to pass something like "" if you are also passing an error.
+                 As a special case, you may pass an io.Reader (or io.ReadCloser) and the
+                 contents of the reader will be streamed to the response via io.Copy().
+                 This is ecpecially useful for large contents that cannot be kept in memory.
+                 If this is an io.ReadCloser() then Close() will be called after all the contents
+                 are copied.
  - int - An http response code (eg http.StatusOK or http.StatusBadRequest).
          If 0, then the code will be inferred from the context.
+ - string - The Content Type.
+            If not returned (or an empty string), then the value set with ApiMethodFactory.SetContentType() will be used.
+            This allows you to override the content type on a per-request basis.
  - error - Any error that occurred.
            In the case of an error, the response (interface{}) will be ignored and a failure response will be issued.
            The http status will still be honored.
-Once again, you can specify anywhere between zero and all three return values.
+
+Once again, you can specify anywhere between zero and all four return values.
 The return values must be typed exactly.
 However, they may be returned in any order.
+In most cases, empty values can be returned and a reasonable value will be chosen for you.
 
 ## Security
 
@@ -88,7 +99,7 @@ The signature for the validation function looks like:
 type ValidateToken func(token string, log Logger) (userId int, userName string, err error)
 ```
 
-Authentication is controled on a per-ApiMethod basis using the auth parameter to ApiMethodFactory.NewApiMethod().
+Authentication is controlled on a per-ApiMethod basis using the auth parameter to ApiMethodFactory.NewApiMethod().
 If turned off, there will be no attempt to fetch a token or validate tokens.
 
 ## Constructing ApiMethods
