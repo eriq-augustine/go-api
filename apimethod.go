@@ -136,12 +136,19 @@ func (method ApiMethod) validate() {
       method.log.Panic(fmt.Sprintf("API handler (%s) has too many return values. Got %d. Maximum is 4.", method.path, numReturns));
    }
 
+   // All of the return types are unique.
+   var seenReturnTypes map[string]bool = make(map[string]bool);
    for i := 0; i < numReturns; i++ {
-      var returnType reflect.Type = handlerType.Out(i);
+      var returnType string = handlerType.Out(i).String();
 
-      if (!(returnType.String() == "interface {}" || returnType.String() == "int" || returnType.String() == "string" || returnType.String() == "error")) {
-         method.log.Panic(fmt.Sprintf("API handler (%s) has an bad return type (%s) must be interface{}, int, string, or error", method.path, returnType.String()));
+      if (!(returnType == "interface {}" || returnType == "int" || returnType == "string" || returnType == "error")) {
+         method.log.Panic(fmt.Sprintf("API handler (%s) has an bad return type (%s) must be interface{}, int, string, or error", method.path, returnType));
       }
+
+      if (seenReturnTypes[returnType]) {
+         method.log.Panic(fmt.Sprintf("API handler (%s) has duplicate return types (%s). Can only have up to four return types and each must be a unique type (interface{}, int, string, or error).", method.path, returnType));
+      }
+      seenReturnTypes[returnType] = true;
    }
 }
 

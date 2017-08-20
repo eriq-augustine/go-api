@@ -175,6 +175,14 @@ func TestValidation(t *testing.T) {
          params: []ApiMethodParam{},
          valid: true,
       },
+      {
+         title: "Valid - Return 4",
+         path: "/good/path",
+         handler: handler_return4_good,
+         auth: false,
+         params: []ApiMethodParam{},
+         valid: true,
+      },
 
       // Invalid methods
 
@@ -357,6 +365,10 @@ func handler_return3() (error, int, interface{}) {
 
 func handler_return4() (error, int, interface{}, int) {
    return nil, 0, nil, 0;
+}
+
+func handler_return4_good() (error, int, interface{}, string) {
+   return nil, 0, nil, "";
 }
 
 func handler_returnBadType() (bool) {
