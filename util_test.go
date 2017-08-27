@@ -82,7 +82,7 @@ func TestGetToken_Basic(t *testing.T) {
       }
 
       request.Header.Set(test.authHeaderKey, test.authHeaderValue);
-      token, ok := getToken(request);
+      token, ok := getToken(request, false);
 
       if (ok != test.ok) {
          failTest(t, test.title, test.ok, ok);

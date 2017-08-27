@@ -14,6 +14,7 @@ import (
 
 const (
    MULTIPART_PARSE_SIZE = 4 * 1024 * 1024 // Store the first 4M in memory.
+   PARAM_TOKEN = "token"
 )
 
 const (
@@ -47,6 +48,7 @@ type ApiMethod struct {
    path string
    handler interface{}
    auth bool
+   allowTokenParam bool
    params []ApiMethodParam
    log Logger
    serializer Serializer
@@ -63,6 +65,12 @@ type ApiMethodParam struct {
 
 func (method ApiMethod) Path() string {
    return method.path;
+}
+
+// Returns this so you can chain.
+func (method *ApiMethod) SetAllowTokenParam(val bool) *ApiMethod {
+   method.allowTokenParam = val;
+   return method;
 }
 
 // Will just panic on error.
@@ -387,7 +395,7 @@ func (method ApiMethod) sendResponse(responseString string, err error, httpStatu
 // user id and token will only be populated on success.
 // response object will only be populated on error.
 func (method ApiMethod) authRequest(request *http.Request) (bool, int, string, string, interface{}) {
-   token, ok := getToken(request);
+   token, ok := getToken(request, method.allowTokenParam);
 
    if (!ok) {
       return false, 0, "", "", method.errorResponder(TokenValidationError{TOKEN_VALIDATION_NO_TOKEN}, http.StatusUnauthorized);

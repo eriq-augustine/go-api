@@ -87,10 +87,11 @@ In most cases, empty values can be returned and a reasonable value will be chose
 
 Requests are authorized via tokens.
 Tokens can be any string (such as any hex key or a JWT).
-Tokens must be passed through "Authorization" HTTP header and be prefixed with "Bearer ".
-Ex: "Bearer SOMETOKEN".
+Tokens can be passed on one of two ways:
+ - They may always be passed through "Authorization" HTTP header and be prefixed with "Bearer ". Ex: "Bearer SOMETOKEN".
+ - If SetAllowTokenParam(true) is called on the ApiMethod, then tokens can be passed as HTTP query parameters with the key: "token".
 
-After picked up from the HTTP headers, tokens will be passed to the token validation function assigned to the ApiMethodFactory.
+After picked up from whatever source, tokens will be passed to the token validation function assigned to the ApiMethodFactory.
 The id and name of the requesting user should be returned when a token is validated.
 The id and name will be blindly passed to the handler (if requested by the handler), so feel free to default one if they are not used.
 

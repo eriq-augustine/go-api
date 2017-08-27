@@ -51,7 +51,7 @@ func (factory *ApiMethodFactory) setDefaults() {
    }
 }
 
-func (factory ApiMethodFactory) NewApiMethod(path string, handler interface{}, auth bool, params []ApiMethodParam) ApiMethod {
+func (factory ApiMethodFactory) NewApiMethod(path string, handler interface{}, auth bool, params []ApiMethodParam) *ApiMethod {
    (&factory).setDefaults();
 
    // Ensure that there is a token validator if authentication is requested.
@@ -60,17 +60,18 @@ func (factory ApiMethodFactory) NewApiMethod(path string, handler interface{}, a
    }
 
    var method ApiMethod = ApiMethod{
-      path,
-      handler,
-      auth,
-      params,
-      factory.log,
-      factory.serializer,
-      factory.contentType,
-      factory.errorResponder,
-      factory.tokenValidator,
+      path: path,
+      handler: handler,
+      auth: auth,
+      params: params,
+      log: factory.log,
+      allowTokenParam: false,
+      serializer: factory.serializer,
+      contentType: factory.contentType,
+      errorResponder: factory.errorResponder,
+      tokenValidator: factory.tokenValidator,
    };
 
    method.validate();
-   return method;
+   return &method;
 }

@@ -6,19 +6,20 @@ import (
    "strings"
 );
 
-func getToken(request *http.Request) (string, bool) {
+func getToken(request *http.Request, allowTokenParam bool) (string, bool) {
+   var tokenText string = "";
+
+   // First check the header and then the query params if allowed.
    authHeader, ok := request.Header["Authorization"];
+   if (ok) {
+      tokenText = authHeader[0];
+   } else if (!ok && allowTokenParam) {
+      request.ParseMultipartForm(MULTIPART_PARSE_SIZE);
 
-   if (!ok) {
-      return "", false;
+      tokenText = request.FormValue(PARAM_TOKEN);
    }
 
-   if (len(authHeader) == 0) {
-      return "", false;
-   }
-
-   token := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(authHeader[0]), "Bearer"));
-
+   token := strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(tokenText), "Bearer"));
    if (token == "") {
       return "", false;
    }
