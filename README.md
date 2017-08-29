@@ -64,10 +64,13 @@ Up to four values can be returned:
  - interface{} - The value to be serialized and put in the http response.
                  This will usaully be turned to JSON.
                  Feel free to pass something like "" if you are also passing an error.
-                 As a special case, you may pass an io.Reader (or io.ReadCloser) and the
-                 contents of the reader will be streamed to the response via io.Copy().
+                 As a special case, you may pass an io.Reader or an io.ReadSeeker and the
+                 contents of the reader will be streamed to the response.
+                 In the case of an io.ReadSeeker, http.ServeContent will be used which
+                 supports range requests (which is required for seeking in media files).
+                 In the case of an io.Reader, the contents will be copied via io.Copy().
                  This is ecpecially useful for large contents that cannot be kept in memory.
-                 If this is an io.ReadCloser() then Close() will be called after all the contents
+                 If this is an io.Closer() then Close() will be called after all the contents
                  are copied.
  - int - An http response code (eg http.StatusOK or http.StatusBadRequest).
          If 0, then the code will be inferred from the context.

@@ -10,6 +10,7 @@ import (
    "runtime"
    "strconv"
    "strings"
+   "time"
 )
 
 const (
@@ -162,10 +163,6 @@ func (method ApiMethod) validate() {
 
 func (method ApiMethod) Middleware() func(response http.ResponseWriter, request *http.Request) {
    return func(response http.ResponseWriter, request *http.Request) {
-      response.Header().Set("Access-Control-Allow-Origin", "*");
-      response.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-      response.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization");
-
       // Skip preflight checks.
       if (request.Method == "OPTIONS") {
          return;
@@ -176,16 +173,37 @@ func (method ApiMethod) Middleware() func(response http.ResponseWriter, request 
       }
 
       responseObj, httpStatus, contentType, err := method.handleAPIRequest(response, request);
-
-      // Wait until the handler responds to call set the content type.
       response.Header().Set("Content-Type", contentType);
 
-      // TODO(eriq): Cleanup use of sendresponse.
-      //  Directly call for an error, maybe.
       if (err != nil) {
          method.sendResponse("", err, httpStatus, response);
          return;
       }
+
+      // Check to see if we need to close the caller's response object when we are done.
+      defer func() {
+         closer, ok := responseObj.(io.Closer);
+         if (ok) {
+            err = closer.Close();
+            if (err != nil) {
+               method.log.WarnE("Error closing a response reader, but the response still went out fine.", err);
+            }
+         }
+      }();
+
+      // If the response object is an io.ReadSeeker, then we will let
+      // http.ServeContent take care of almost all the work
+      // (except setting the content type).
+      readSeeker, ok := responseObj.(io.ReadSeeker);
+      if (ok) {
+         http.ServeContent(response, request, "", time.Time{}, readSeeker);
+         return;
+      }
+
+      // Set some standard headers.
+      response.Header().Set("Access-Control-Allow-Origin", "*");
+      response.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+      response.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization");
 
       // If the response object is a reader, then stream it into the response writer.
       reader, ok := responseObj.(io.Reader);
@@ -195,20 +213,11 @@ func (method ApiMethod) Middleware() func(response http.ResponseWriter, request 
          }
 
          response.WriteHeader(httpStatus);
+
          _, err = io.Copy(response, reader);
          if (err != nil) {
             // The reeponse may have got partially written... so just abandon the request.
             method.log.ErrorE("Failed to stream the response", err);
-            return;
-         }
-
-         // Check to see if we need to close the reader.
-         closer, ok := reader.(io.Closer);
-         if (ok) {
-            err = closer.Close();
-            if (err != nil) {
-               method.log.WarnE("Error closing a response reader, but the response still went out fine.", err);
-            }
          }
       } else {
          // Otherwise, just serialize the response and send it over.
